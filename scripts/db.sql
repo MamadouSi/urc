@@ -5,14 +5,14 @@ CREATE TABLE users (
    email VARCHAR ( 255 ) UNIQUE NOT NULL,
    created_on TIMESTAMP NOT NULL,
    last_login TIMESTAMP,
-   external_id VARCHAR ( 50 ) UNIQUE NOT NULL,
+   external_id VARCHAR ( 50 ) UNIQUE NOT NULL
 );
 
 CREATE TABLE rooms (
    room_id serial PRIMARY KEY,
    name VARCHAR ( 50 ) UNIQUE NOT NULL,
    created_on TIMESTAMP NOT NULL,
-   created_by INTEGER NOT NULL,
+   created_by INTEGER NOT NULL
 );
 
 
