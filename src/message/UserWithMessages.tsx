@@ -1,49 +1,80 @@
-//MessageComponent.tsx
+// UserWithMessages.jsx
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams, useLocation } from 'react-router-dom';
+import { selectUser } from '../user/userSlice';
+import RoomList from './RoomList';
+import RoomForm from './RoomForm';
 import MessageList from './MessageList';
 import MessageForm from './MessageForm';
+import { Container, Paper, Typography } from '@mui/material';
+
 interface User {
     user_id: number;
     username: string;
     last_login: string;
 }
 
+function handleSendMessage(message: any) {
+    // Gestion de l'envoi de message
+    // ...
+}
+
 const UserWithMessages: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const currentUser = useSelector(selectUser);
+    const { userId, nomdusalon } = useParams();
+    const location = useLocation();
 
     useEffect(() => {
-        // Utilisez ici un appel API pour récupérer la liste des utilisateurs
-        fetch('/api/users')
-            .then((response) => response.json())
-            .then((data: User[]) => setUsers(data))
-            .catch((error) => console.error('Error fetching users:', error));
-    }, []);
+        const storedToken = sessionStorage.getItem('token');
+        const authToken = storedToken || currentUser?.token;
 
-    const handleUserSelect = (user: User) => {
-        setSelectedUser(user);
-    };
+        if (authToken) {
+            fetch('/api/users', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            })
+                .then((response) => response.json())
+                .then((data: User[]) => setUsers(data))
+                .catch((error) => console.error('Error fetching users:', error));
+        }
+    }, [currentUser]);
+
+    useEffect(() => {
+        const userById = users.find((user) => user.user_id === Number(userId));
+        setSelectedUser(userById || null);
+    }, [userId, users]);
 
     return (
-        <div>
-            <h2>Liste des utilisateurs</h2>
-            <ul>
-                {users.map((user) => (
-                    <li key={user.user_id} onClick={() => handleUserSelect(user)}>
-                        {user.username} - Dernière connexion : {user.last_login}
-                    </li>
-                ))}
-            </ul>
-
-            {selectedUser && (
-                <div>
-                    <h2>Conversation avec {selectedUser.username}</h2>
-
-                    <MessageList sender={currentUser} recipient={selectedUser} />
-                   <MessageForm sender={currentUser} recipient={selectedUser} onSendMessage={undefined} />
-                </div>
+        <Container maxWidth="md">
+            {location.pathname.startsWith('/salon') && nomdusalon && (
+                <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
+                    <Typography variant="h5" gutterBottom>
+                        Salon: {nomdusalon}
+                    </Typography>
+                    <RoomList/>
+                    <RoomForm
+                        nomdusalon={nomdusalon}
+                        onSendMessage={(message: any) => handleSendMessage(message)}
+                    />
+                </Paper>
             )}
-        </div>
+            {location.pathname.startsWith('/messages/user') && selectedUser && (
+                <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
+                    <Typography variant="h5" gutterBottom>
+                        Messages with {selectedUser.username}
+                    </Typography>
+                    <MessageList selectedUser={selectedUser} />
+                    <MessageForm
+                        recipient={selectedUser.user_id || ''}
+                        onSendMessage={(message: any) => handleSendMessage(message)}
+                    />
+                </Paper>
+            )}
+        </Container>
     );
 };
 
