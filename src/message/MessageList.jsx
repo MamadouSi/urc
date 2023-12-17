@@ -71,11 +71,11 @@ const MessageList = ({ selectedUser }) => {
     };
 
     return (
-        <div>
+        <div style={{ height: '80vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h5" gutterBottom>
                 Conversation entre {currentUsername} et {selectedUser?.username}
             </Typography>
-            <Paper style={{ maxHeight: '400px', overflowY: 'scroll' }}>
+            <Paper style={{ flex: 1, overflowY: 'scroll' }}>
                 <Grid container direction="column" spacing={2} style={{ padding: '10px' }}>
                     {messages.length > 0 && messages.map((message, index) => (
                         <Grid

@@ -1,7 +1,14 @@
+//UserList.tsx
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectUser } from './userSlice';
+import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface User {
     user_id: number;
@@ -11,18 +18,13 @@ interface User {
 
 const UserList: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const { token } = useSelector(selectUser);
+    const { token, id: currentUserId } = useSelector(selectUser);
 
     useEffect(() => {
-        // Récupérer le token depuis le sessionStorage
         const storedToken = sessionStorage.getItem('token');
-
-        // Utiliser le token stocké ou celui dans le state s'il est disponible
         const authToken = storedToken || token;
 
-        // Vérifier si le token est présent avant d'effectuer l'appel API
         if (authToken) {
-            // Utiliser un appel API ici pour récupérer la liste des utilisateurs
             fetch('/api/users', {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -34,18 +36,29 @@ const UserList: React.FC = () => {
         }
     }, [token]);
 
+    // Filtrer la liste des utilisateurs pour exclure l'utilisateur connecté
+    const filteredUsers = users.filter((user) => user.user_id !== currentUserId);
+
     return (
         <div>
             <h2>Liste des utilisateurs</h2>
-            <ul>
-                {users.length > 0 && users.map((user) => (
-                    <li key={user.user_id}>
-                        <Link to={`/messages/user/${user.user_id}`}>
-                            {user.username} - Dernière connexion : {user.last_login}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+            <List>
+                {filteredUsers.length > 0 &&
+                    filteredUsers.map((user) => (
+                        <ListItem key={user.user_id} button component={Link} to={`/messages/user/${user.user_id}`}>
+                            <ListItemAvatar>
+                                <Avatar>
+                                    {/* Use the Person icon (you can replace it with any other Material-UI icon) */}
+                                    <PersonIcon />
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={user.username}
+                                secondary={`Dernière connexion : ${user.last_login}`}
+                            />
+                        </ListItem>
+                    ))}
+            </List>
         </div>
     );
 };

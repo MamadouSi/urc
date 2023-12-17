@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../user/userSlice';
 import { useLocation } from 'react-router-dom';
 import { Paper, Grid, Typography } from '@mui/material';
-// ... (imports inchangés)
 
 const RoomList = () => {
     const [messages, setMessages] = useState([]);
@@ -68,9 +67,20 @@ const RoomList = () => {
     };
 
     return (
-        <div>
+        <div style={{ height: '80vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
+            <style>
+                {`
+                    .chat,
+                    .chat__body {
+                        display: flex;
+                        position: relative;
+                    }
+
+                    // Add any additional styles here
+                `}
+            </style>
             <Typography variant="h5" gutterBottom>
-                Conversation dans le salon : {nomsalon}
+                {nomsalon}
             </Typography>
             <Paper style={{ maxHeight: '400px', overflowY: 'scroll' }}>
                 <Grid container direction="column" spacing={2} style={{ padding: '10px' }}>

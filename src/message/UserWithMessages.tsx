@@ -1,4 +1,3 @@
-// UserWithMessages.jsx
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams, useLocation } from 'react-router-dom';
@@ -15,14 +14,10 @@ interface User {
     last_login: string;
 }
 
-function handleSendMessage(message: any) {
-    // Gestion de l'envoi de message
-    // ...
-}
-
 const UserWithMessages: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [messages, setMessages] = useState<any[]>([]); // State for messages
     const currentUser = useSelector(selectUser);
     const { userId, nomdusalon } = useParams();
     const location = useLocation();
@@ -48,14 +43,19 @@ const UserWithMessages: React.FC = () => {
         setSelectedUser(userById || null);
     }, [userId, users]);
 
+    const handleSendMessage = (message: any) => {
+        // Update the messages state with the new message
+        setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
     return (
-        <Container maxWidth="md">
+        <Container>
             {location.pathname.startsWith('/salon') && nomdusalon && (
                 <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
                     <Typography variant="h5" gutterBottom>
                         Salon: {nomdusalon}
                     </Typography>
-                    <RoomList/>
+                    <RoomList />
                     <RoomForm
                         nomdusalon={nomdusalon}
                         onSendMessage={(message: any) => handleSendMessage(message)}
@@ -79,3 +79,4 @@ const UserWithMessages: React.FC = () => {
 };
 
 export default UserWithMessages;
+

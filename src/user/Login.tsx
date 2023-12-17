@@ -1,17 +1,27 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Avatar from "@mui/material/Avatar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Paper from "@mui/material/Paper";
 import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
-import { Link, useNavigate } from "react-router-dom";
-import { setUser, clearUser } from "./userSlice"; // Import the setUser action
+import { setUser, clearUser } from "./userSlice";
 
 export function Login() {
     const [error, setError] = useState({} as CustomError);
-    const dispatch = useDispatch(); // Get the dispatch function from the Redux store
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form);
@@ -25,7 +35,6 @@ export function Login() {
             (result: Session) => {
                 console.log(result);
 
-                // Dispatch the setUser action to store the user details in the Redux store
                 dispatch(
                     setUser({
                         token: result.token,
@@ -43,26 +52,60 @@ export function Login() {
                 console.log(loginError);
                 setError(loginError);
 
-                // Dispatch the clearUser action in case of a login error
                 dispatch(clearUser());
             }
         );
     };
 
     return (
-        <>
-            <form onSubmit={handleSubmit}>
-                <input name="login" placeholder="login" />
-                <br />
-                <input name="password" placeholder="password" />
-                <br />
-                <button type="submit">connexion</button>
-            </form>
-            <p>
-                Vous n&apos;avez pas de compte ?{" "}
-                <Link to="/register">Créez un compte ici</Link>.
-            </p>
-            {error.message && <span>{error.message}</span>}
-        </>
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Paper elevation={3} component={Box} p={4} mt={8}>
+                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Connexion
+                </Typography>
+                <form onSubmit={handleSubmit} style={{ marginTop: "1em" }}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="login"
+                        label="Login"
+                        name="login"
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        style={{ marginTop: "1em" }}
+                    >
+                        Connexion
+                    </Button>
+                </form>
+                <Grid container justifyContent="flex-end" style={{ marginTop: "1em" }}>
+                    <Grid item>
+                        <Link to="/register">Pas encore de compte ? Créez-en un</Link>
+                    </Grid>
+                </Grid>
+                {error.message && (
+                    <Typography color="error" variant="body2" style={{ marginTop: "1em" }}>
+                        {error.message}
+                    </Typography>
+                )}
+            </Paper>
+        </Container>
     );
 }
